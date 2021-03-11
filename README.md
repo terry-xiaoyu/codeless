@@ -1,6 +1,6 @@
 # codeless
 
-基于 emqx 的物联网数据处理中间件。
+基于 emqx(https://github.com/emqx/emqx) 的物联网数据处理中间件（实验阶段）
 
 提供管理各种数据源、数据库、其他消息中间件等的功能。
 外加一套简单、灵活的数据处理 DSL。
@@ -66,61 +66,60 @@ II. DSL 功能
 
 基本：
 
-数据类型: strings, numbers, maps, lists
-数据操作: 下标读取，Map 插入等等
-函数定义:
-函数调用:
-计算: 数学计算
-条件分支: case
-循环: while, foreach
+- 数据类型: strings, numbers, maps, lists
+- 数据操作: 下标读取，Map 插入等等
+- 函数定义:
+- 函数调用:
+- 计算: 数学计算
+- 条件分支: case
+- 循环: while, foreach
 
 高级：
 
-pipe
-list comprehension
+- pipe
+- list comprehension
 
 2. stdlibs
 
-strings
-binary
-crypto
-time
-jq (json string processing)
-emqx (getting connection info, publishing messages, etc. All the functions that are provided by HTTP API should be supported here)
+- strings
+- binary
+- crypto
+- time
+- jq (json string processing)
+- emqx (getting connection info, publishing messages, etc. All the functions that are provided by HTTP API should be supported here)
 
 3. triggers
 
-mqtt.client_connected
-mqtt.publish
-mqtt.auth_request
+- mqtt.client_connected
+- mqtt.publish
+- mqtt.auth_request
 ...
 
-coap.put
-coap.post
-coap.auth_request
+- coap.put
+- coap.post
+- coap.auth_request
 ...
 
-lwm2m.registered
-lwm2m.notify
-lwm2m.auth_request
+- lwm2m.registered
+- lwm2m.notify
+- lwm2m.auth_request
 ...
 
-kafka.msg_in
+- kafka.msg_in
 ...
 
-timers.interval
-timers.schedule_at
+- timers.interval
+- timers.schedule_at
 ...
 
 4. function provided by plugins/gateways/sinks
 
-coap:res_1.send('post', peer_ip_port, '/path').
-lwm2m:res_2.send('client-a', '/3/0/1', payload).
-mysql:res_3.query('SELECT * FROM table', timeout).
-kafka:res_4.produce('t/1', payload)
+- coap:res_1.send('post', peer_ip_port, '/path').
+- lwm2m:res_2.send('client-a', '/3/0/1', payload).
+- mysql:res_3.query('SELECT * FROM table', timeout).
+- kafka:res_4.produce('t/1', payload)
 
 5. in memory key-value db
 
-kv.put(key, value)
-kv.get(key, default)
-
+- kv.put(key, value)
+- kv.get(key, default)
