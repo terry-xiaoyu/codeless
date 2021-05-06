@@ -1,24 +1,24 @@
 # codeless
 
-基于 emqx(https://github.com/emqx/emqx) 的物联网数据处理中间件（实验阶段）
+emqx(https://github.com/emqx/emqx) 数据处理插件（实验阶段）
 
-提供管理各种数据源、数据库、其他消息中间件等的功能。
+提供 API 访问各种数据库、其他消息中间件以及各种协议网关。提供各种 emqx 内部操作 API。
 外加一套简单、灵活的数据处理 DSL。
 
-数据源：
+数据源可能有：
 - mqtt
-- gateways: 各种协议
+- gateways: lwm2m 等各种协议网关
+- http api
+- 订阅自其他 broker 的消息
 
-数据库：
-- sql
-- nosql
+数据输出可能包括：
+- 数据库和其他 broker
+- HTTP 回调
+- MQTT
+- gateways
 
-其他 Broker 桥接:
-- kafka
-- rabbitmq
-
-其中数据源、桥接提供 triggers 和 一些消息发送等 functions.
-数据库提供一些 query functions.
+数据源提供 triggers
+数据输出提供 send/query functions.
 
 DSL 需要选择一个或者多个 trigger 作为输入，调用数据库和中间件等提供的 function 做消息转移。
 
@@ -29,35 +29,33 @@ I. 场景举例
 当收到主题为 't/1' 的 MQTT 消息，首先做 Avro 解码。
 解码后发送给 lwm2m 设备（指令下发），然后根据消息类型分别发送到 mysql 和 kafka 做消息备份。
 
-playground:
+task:
 
 ```
 ## define a function sending data according to the data type
-func send_data('write', data):
+func send_data('write', data) {
     ## call the 'produce' API of a kafka resource 'res_4' 
-    kafka:res_4.produce('t/1', data)
-end
+    kafka.produce('res_4', 't/1', data)
+}
 
-func send_data('read', data):
-    mysql:res_3.query('insert into table values (data.x, data.y))
-end
+func send_data('read', data) {
+    mysql.query('res_3', 'insert into table values (data.x, data.y))
+}
 
-trigger 'mqtt:publish' when topic = 't/1':
-
+trigger 'mqtt:publish' when topic = 't/1' {
     ## decode it by avro schema
     data = schema_registry.decode(avro, 'schema-1' payload)
 
     ## log it out for debugging
-    system.logger('info', data)
+    emqx.log('info', data)
 
     ## send to the lwm2m device with endpoint name = 'client-a'
     ## call the 'send' API of the lwm2m resource named 'res_2'
-    lwm2m:res_2.send('client-a', '/3/0/1', data)
+    lwm2m.send('res_2', 'client-a', '/3/0/1', data)
 
     ## call the self-defined function
     send_data(data.type)
-
-end
+}
 ```
 
 II. DSL 功能
